@@ -7,6 +7,10 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ## [Unreleased]
 
+### Changed
+
+- Relicensed Banyan Labs prospectively from MIT to AGPL-3.0-or-later.
+
 ### Added
 
 - Initialized the repository with the Base-managed repo baseline.

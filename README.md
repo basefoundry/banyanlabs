@@ -2,6 +2,26 @@
 
 Banyan Labs is a realistic infrastructure and platform engineering lab.
 
+## License
+
+Copyright (C) 2019-2026 Ramesh Padmanabhaiah
+
+Banyan Labs is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+Banyan Labs is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
+
+You should have received a copy of the GNU Affero General Public License along
+with Banyan Labs. If not, see <https://www.gnu.org/licenses/>.
+
+Versions before this relicensing change remain available under the MIT License
+as originally published. New versions are licensed under AGPL-3.0-or-later.
+
 The purpose is to build deep DevOps, SRE, and platform engineering knowledge by
 assembling real services and infrastructure tools into a meaningful environment.
 Certifications can introduce AWS, GCP, Azure, Kubernetes, Terraform, CI/CD,
