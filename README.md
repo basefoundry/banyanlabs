@@ -2,6 +2,17 @@
 
 Banyan Labs is a realistic infrastructure and platform engineering lab.
 
+## License
+
+Copyright (C) 2019-2026 Ramesh Padmanabhaiah.
+
+Banyan Labs is licensed under the GNU Affero General Public License v3.0 or
+later. See [LICENSE](LICENSE).
+
+Previous versions released under the MIT License remain available under MIT as
+licensed at the time. New versions from this relicensing change forward are
+licensed under AGPL v3.
+
 The purpose is to build deep DevOps, SRE, and platform engineering knowledge by
 assembling real services and infrastructure tools into a meaningful environment.
 Certifications can introduce AWS, GCP, Azure, Kubernetes, Terraform, CI/CD,

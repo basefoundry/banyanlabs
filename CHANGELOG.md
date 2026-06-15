@@ -7,6 +7,11 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ## [Unreleased]
 
+### Changed
+
+- Relicensed new Banyan Labs versions from MIT to GNU Affero General Public
+  License v3.0 or later.
+
 ### Added
 
 - Initialized the repository with the Base-managed repo baseline.
