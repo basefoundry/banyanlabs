@@ -9,6 +9,7 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Changed
 
+- Moved the README license notice out of the opening project summary.
 - Relicensed Banyan Labs prospectively from MIT to AGPL-3.0-or-later.
 
 ### Added
