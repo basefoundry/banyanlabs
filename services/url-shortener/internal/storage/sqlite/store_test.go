@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage"
 )
 
 func TestStoreCreatesAndFindsUser(t *testing.T) {

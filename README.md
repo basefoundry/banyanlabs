@@ -66,7 +66,7 @@ API contracts and black-box smoke tests live with the repo:
 The shared developer bootstrap layer no longer lives here.
 
 That foundational layer now belongs in
-[`base`](https://github.com/codeforester/base#readme), including:
+[`base`](https://github.com/basefoundry/base#readme), including:
 
 - shell environment bootstrap
 - shared Bash wrapper and command conventions

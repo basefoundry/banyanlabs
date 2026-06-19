@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage"
 	"golang.org/x/crypto/bcrypt"
 )
 

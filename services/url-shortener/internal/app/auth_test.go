@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage/sqlite"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage/sqlite"
 	"golang.org/x/crypto/bcrypt"
 )
 

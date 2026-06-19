@@ -28,15 +28,15 @@ platform surface.
 
 Current issue train:
 
-- [#26](https://github.com/codeforester/banyanlabs/issues/26) Create Go URL
+- [#26](https://github.com/basefoundry/banyanlabs/issues/26) Create Go URL
   shortener service skeleton
-- [#27](https://github.com/codeforester/banyanlabs/issues/27) Implement URL
+- [#27](https://github.com/basefoundry/banyanlabs/issues/27) Implement URL
   shortener user management
-- [#28](https://github.com/codeforester/banyanlabs/issues/28) Implement URL
+- [#28](https://github.com/basefoundry/banyanlabs/issues/28) Implement URL
   shortening and redirect behavior
-- [#29](https://github.com/codeforester/banyanlabs/issues/29) Add minimal HTML
+- [#29](https://github.com/basefoundry/banyanlabs/issues/29) Add minimal HTML
   UI for URL shortener
-- [#30](https://github.com/codeforester/banyanlabs/issues/30) Add JWT
+- [#30](https://github.com/basefoundry/banyanlabs/issues/30) Add JWT
   authentication for API clients
 
 Entry criteria:
@@ -55,7 +55,7 @@ Completion criteria:
 
 ## Phase 2: Local Platform Composition
 
-Tracking issue: [#33](https://github.com/codeforester/banyanlabs/issues/33)
+Tracking issue: [#33](https://github.com/basefoundry/banyanlabs/issues/33)
 
 Goal: compose the local product with realistic runtime dependencies and
 operational tooling.
@@ -79,7 +79,7 @@ Completion criteria:
 
 ## Phase 3: Observability Foundation
 
-Tracking issue: [#34](https://github.com/codeforester/banyanlabs/issues/34)
+Tracking issue: [#34](https://github.com/basefoundry/banyanlabs/issues/34)
 
 Goal: make service behavior visible through logs, metrics, traces, dashboards,
 and alerts.
@@ -102,7 +102,7 @@ Completion criteria:
 
 ## Phase 4: CI/CD And Supply Chain
 
-Tracking issue: [#35](https://github.com/codeforester/banyanlabs/issues/35)
+Tracking issue: [#35](https://github.com/basefoundry/banyanlabs/issues/35)
 
 Goal: expand the current test baseline into automated build, scan, package, and
 release discipline.
@@ -125,7 +125,7 @@ Completion criteria:
 
 ## Phase 5: Local Kubernetes
 
-Tracking issue: [#36](https://github.com/codeforester/banyanlabs/issues/36)
+Tracking issue: [#36](https://github.com/basefoundry/banyanlabs/issues/36)
 
 Goal: run Banyan Labs locally in Kubernetes after the local service and platform
 stack are useful.
@@ -149,7 +149,7 @@ Completion criteria:
 
 ## Phase 6: Multi-Service And Multi-Language Expansion
 
-Tracking issue: [#37](https://github.com/codeforester/banyanlabs/issues/37)
+Tracking issue: [#37](https://github.com/basefoundry/banyanlabs/issues/37)
 
 Goal: add multiple services and languages to practice platform consistency
 across different application stacks.
@@ -174,7 +174,7 @@ Completion criteria:
 
 ## Phase 7: Infrastructure As Code And Cloud Environments
 
-Tracking issue: [#38](https://github.com/codeforester/banyanlabs/issues/38)
+Tracking issue: [#38](https://github.com/basefoundry/banyanlabs/issues/38)
 
 Goal: model repeatable dev, staging, and production environments after local
 deployment and observability patterns are proven.
