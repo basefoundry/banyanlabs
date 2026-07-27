@@ -125,6 +125,19 @@ func (store *Store) DeleteSessionByTokenHash(ctx context.Context, tokenHash stri
 	return err
 }
 
+func (store *Store) DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error) {
+	result, err := store.db.ExecContext(ctx, "DELETE FROM sessions WHERE expires_at <= ?", formatTime(now))
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("read deleted expired session row count: %w", err)
+	}
+	return rowsAffected, nil
+}
+
 func (store *Store) findSessionByID(ctx context.Context, id int64) (storage.Session, error) {
 	return scanSession(store.db.QueryRowContext(
 		ctx,

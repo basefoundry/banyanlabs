@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage/sqlite"
 	"golang.org/x/crypto/bcrypt"
@@ -211,6 +212,57 @@ func TestCurrentUserRejectsLoggedOutSession(t *testing.T) {
 	_, err = application.CurrentUser(ctx, signup.Token)
 	if !errors.Is(err, ErrInvalidCredentials) {
 		t.Fatalf("current user error = %v, want %v", err, ErrInvalidCredentials)
+	}
+}
+
+func TestCleanupExpiredSessionsDeletesExpiredRows(t *testing.T) {
+	ctx := context.Background()
+	application, db := newAuthTestApp(t, ctx)
+	now := time.Now().UTC()
+
+	signup, err := application.Signup(ctx, SignupInput{
+		Username: "alice",
+		Email:    "alice@example.com",
+		Password: "correct horse battery staple",
+	})
+	if err != nil {
+		t.Fatalf("signup: %v", err)
+	}
+
+	login, err := application.Login(ctx, LoginInput{
+		Username: "alice",
+		Password: "correct horse battery staple",
+	})
+	if err != nil {
+		t.Fatalf("login: %v", err)
+	}
+
+	expiredAt := now.Add(-time.Minute).Format(time.RFC3339Nano)
+	if _, err := db.ExecContext(ctx, "UPDATE sessions SET expires_at = ? WHERE id = ?", expiredAt, signup.Session.ID); err != nil {
+		t.Fatalf("expire signup session: %v", err)
+	}
+
+	deleted, err := application.CleanupExpiredSessions(ctx, now)
+	if err != nil {
+		t.Fatalf("cleanup expired sessions: %v", err)
+	}
+	if deleted != 1 {
+		t.Fatalf("deleted sessions = %d, want 1", deleted)
+	}
+
+	var count int
+	if err := db.QueryRowContext(ctx, "SELECT COUNT(*) FROM sessions WHERE id = ?", signup.Session.ID).Scan(&count); err != nil {
+		t.Fatalf("count expired session: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("expired session count = %d, want 0", count)
+	}
+
+	if err := db.QueryRowContext(ctx, "SELECT COUNT(*) FROM sessions WHERE id = ?", login.Session.ID).Scan(&count); err != nil {
+		t.Fatalf("count active session: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("active session count = %d, want 1", count)
 	}
 }
 

@@ -18,6 +18,7 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Added
 
+- Added expired session cleanup for URL shortener browser sessions.
 - Added a Go toolchain guard for local URL shortener build and API smoke-test
   paths.
 - Added the GitHub Project intake configuration and workflow to the repo

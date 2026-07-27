@@ -134,6 +134,66 @@ func TestStoreCreatesAndDeletesSession(t *testing.T) {
 	}
 }
 
+func TestStoreDeletesExpiredSessions(t *testing.T) {
+	ctx := context.Background()
+	store := newTestStore(t, ctx)
+	now := time.Date(2026, 6, 12, 10, 30, 0, 0, time.UTC)
+
+	user, err := store.CreateUser(ctx, storage.CreateUserParams{
+		Username:     "alice",
+		Email:        "alice@example.com",
+		PasswordHash: "hashed-password",
+		Now:          now,
+	})
+	if err != nil {
+		t.Fatalf("create user: %v", err)
+	}
+
+	for _, params := range []storage.CreateSessionParams{
+		{
+			UserID:    user.ID,
+			TokenHash: "expired-token-1",
+			CreatedAt: now.Add(-3 * time.Hour),
+			ExpiresAt: now.Add(-time.Hour),
+		},
+		{
+			UserID:    user.ID,
+			TokenHash: "expired-token-2",
+			CreatedAt: now.Add(-2 * time.Hour),
+			ExpiresAt: now,
+		},
+		{
+			UserID:    user.ID,
+			TokenHash: "active-token",
+			CreatedAt: now,
+			ExpiresAt: now.Add(time.Hour),
+		},
+	} {
+		if _, err := store.CreateSession(ctx, params); err != nil {
+			t.Fatalf("create session %q: %v", params.TokenHash, err)
+		}
+	}
+
+	deleted, err := store.DeleteExpiredSessions(ctx, now)
+	if err != nil {
+		t.Fatalf("delete expired sessions: %v", err)
+	}
+	if deleted != 2 {
+		t.Fatalf("deleted sessions = %d, want 2", deleted)
+	}
+
+	for _, tokenHash := range []string{"expired-token-1", "expired-token-2"} {
+		_, err := store.FindSessionByTokenHash(ctx, tokenHash)
+		if !errors.Is(err, storage.ErrNotFound) {
+			t.Fatalf("find %s error = %v, want %v", tokenHash, err, storage.ErrNotFound)
+		}
+	}
+
+	if _, err := store.FindSessionByTokenHash(ctx, "active-token"); err != nil {
+		t.Fatalf("active session was deleted: %v", err)
+	}
+}
+
 func TestStoreFindsAndTouchesSessionByTokenHash(t *testing.T) {
 	ctx := context.Background()
 	store := newTestStore(t, ctx)

@@ -47,6 +47,7 @@ func run() error {
 		Logger: logger,
 		Store:  sqlite.NewStore(db),
 	})
+	application.StartSessionReaper(ctx)
 	server := httpserver.New(httpserver.Options{
 		Addr:   cfg.Addr,
 		App:    application,

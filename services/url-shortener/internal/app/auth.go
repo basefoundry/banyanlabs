@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -16,8 +17,9 @@ import (
 )
 
 const (
-	sessionTokenBytes = 32
-	sessionTTL        = 24 * time.Hour
+	sessionTokenBytes     = 32
+	sessionTTL            = 24 * time.Hour
+	sessionReaperInterval = time.Hour
 )
 
 var (
@@ -183,6 +185,59 @@ func (app *App) CurrentUser(ctx context.Context, token string) (User, error) {
 	}
 
 	return publicUser(user), nil
+}
+
+func (app *App) CleanupExpiredSessions(ctx context.Context, now time.Time) (int64, error) {
+	store, err := app.requireStore()
+	if err != nil {
+		return 0, err
+	}
+
+	deleted, err := store.DeleteExpiredSessions(ctx, now.UTC())
+	if err != nil {
+		return 0, fmt.Errorf("delete expired sessions: %w", err)
+	}
+	return deleted, nil
+}
+
+func (app *App) StartSessionReaper(ctx context.Context) {
+	app.startSessionReaper(ctx, sessionReaperInterval)
+}
+
+func (app *App) startSessionReaper(ctx context.Context, interval time.Duration) {
+	if interval <= 0 {
+		interval = sessionReaperInterval
+	}
+
+	go func() {
+		app.reapExpiredSessions(ctx)
+
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				app.reapExpiredSessions(ctx)
+			}
+		}
+	}()
+}
+
+func (app *App) reapExpiredSessions(ctx context.Context) {
+	deleted, err := app.CleanupExpiredSessions(ctx, time.Now().UTC())
+	if err != nil {
+		if ctx.Err() == nil {
+			app.logger.Warn("expired session cleanup failed", slog.Any("error", err))
+		}
+		return
+	}
+
+	if deleted > 0 {
+		app.logger.Info("expired sessions deleted", slog.Int64("count", deleted))
+	}
 }
 
 func (app *App) requireStore() (storage.Store, error) {
