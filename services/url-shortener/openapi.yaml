@@ -107,6 +107,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /auth/logout:
@@ -152,6 +154,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    TooManyRequests:
+      description: Too many failed authentication attempts.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     InternalServerError:
       description: Unexpected server error.
       content:
@@ -168,7 +176,9 @@ components:
       properties:
         username:
           type: string
-          minLength: 1
+          minLength: 3
+          maxLength: 40
+          pattern: "^[A-Za-z0-9._-]+$"
           example: alice
         email:
           type: string
@@ -176,7 +186,8 @@ components:
           example: alice@example.com
         password:
           type: string
-          minLength: 1
+          minLength: 12
+          maxLength: 1024
           format: password
           example: correct horse battery staple
     LoginRequest:

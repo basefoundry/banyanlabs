@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/mail"
 	"strings"
 	"time"
 
@@ -20,14 +21,30 @@ const (
 	sessionTokenBytes     = 32
 	sessionTTL            = 24 * time.Hour
 	sessionReaperInterval = time.Hour
+
+	minUsernameLength = 3
+	maxUsernameLength = 40
+	minPasswordLength = 12
+	maxPasswordLength = 1024
+
+	maxFailedLoginAttempts = 5
+	loginFailureWindow     = 15 * time.Minute
+	loginLockoutDuration   = 15 * time.Minute
 )
 
 var (
 	ErrInvalidInput       = errors.New("invalid input")
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrTooManyAttempts    = errors.New("too many attempts")
 	ErrUserAlreadyExists  = errors.New("user already exists")
 	ErrStorageUnavailable = errors.New("storage unavailable")
 )
+
+type loginFailureState struct {
+	Count         int
+	FirstFailedAt time.Time
+	LockedUntil   time.Time
+}
 
 type SignupInput struct {
 	Username string
@@ -65,10 +82,7 @@ type Session struct {
 func (app *App) Signup(ctx context.Context, input SignupInput) (AuthResult, error) {
 	username := strings.TrimSpace(input.Username)
 	email := strings.TrimSpace(input.Email)
-	if username == "" || email == "" || input.Password == "" {
-		return AuthResult{}, ErrInvalidInput
-	}
-	if !strings.Contains(email, "@") {
+	if !validUsername(username) || !validEmail(email) || !strongEnoughPassword(input.Password) {
 		return AuthResult{}, ErrInvalidInput
 	}
 
@@ -104,6 +118,10 @@ func (app *App) Login(ctx context.Context, input LoginInput) (AuthResult, error)
 	if username == "" || input.Password == "" {
 		return AuthResult{}, ErrInvalidInput
 	}
+	now := time.Now().UTC()
+	if err := app.ensureLoginAllowed(username, now); err != nil {
+		return AuthResult{}, err
+	}
 
 	store, err := app.requireStore()
 	if err != nil {
@@ -113,15 +131,18 @@ func (app *App) Login(ctx context.Context, input LoginInput) (AuthResult, error)
 	user, err := store.FindUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {
+			app.recordLoginFailure(username, now)
 			return AuthResult{}, ErrInvalidCredentials
 		}
 		return AuthResult{}, fmt.Errorf("find user: %w", err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)); err != nil {
+		app.recordLoginFailure(username, now)
 		return AuthResult{}, ErrInvalidCredentials
 	}
 
+	app.clearLoginFailures(username)
 	return app.createSession(ctx, user)
 }
 
@@ -238,6 +259,89 @@ func (app *App) reapExpiredSessions(ctx context.Context) {
 	if deleted > 0 {
 		app.logger.Info("expired sessions deleted", slog.Int64("count", deleted))
 	}
+}
+
+func validUsername(username string) bool {
+	if len(username) < minUsernameLength || len(username) > maxUsernameLength {
+		return false
+	}
+
+	for _, char := range username {
+		switch {
+		case char >= 'a' && char <= 'z':
+		case char >= 'A' && char <= 'Z':
+		case char >= '0' && char <= '9':
+		case char == '-' || char == '_' || char == '.':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+func validEmail(email string) bool {
+	address, err := mail.ParseAddress(email)
+	return err == nil && address.Address == email
+}
+
+func strongEnoughPassword(password string) bool {
+	return len(password) >= minPasswordLength && len(password) <= maxPasswordLength
+}
+
+func loginFailureKey(username string) string {
+	return strings.ToLower(strings.TrimSpace(username))
+}
+
+func (app *App) ensureLoginAllowed(username string, now time.Time) error {
+	key := loginFailureKey(username)
+
+	app.loginMu.Lock()
+	defer app.loginMu.Unlock()
+
+	state, ok := app.loginFailures[key]
+	if !ok {
+		return nil
+	}
+
+	if !state.LockedUntil.IsZero() {
+		if now.Before(state.LockedUntil) {
+			return ErrTooManyAttempts
+		}
+		delete(app.loginFailures, key)
+		return nil
+	}
+
+	if now.Sub(state.FirstFailedAt) >= loginFailureWindow {
+		delete(app.loginFailures, key)
+	}
+	return nil
+}
+
+func (app *App) recordLoginFailure(username string, now time.Time) {
+	key := loginFailureKey(username)
+
+	app.loginMu.Lock()
+	defer app.loginMu.Unlock()
+
+	state, ok := app.loginFailures[key]
+	if !ok || now.Sub(state.FirstFailedAt) >= loginFailureWindow {
+		state = loginFailureState{FirstFailedAt: now}
+	}
+
+	state.Count++
+	if state.Count >= maxFailedLoginAttempts {
+		state.LockedUntil = now.Add(loginLockoutDuration)
+	}
+	app.loginFailures[key] = state
+}
+
+func (app *App) clearLoginFailures(username string) {
+	key := loginFailureKey(username)
+
+	app.loginMu.Lock()
+	defer app.loginMu.Unlock()
+
+	delete(app.loginFailures, key)
 }
 
 func (app *App) requireStore() (storage.Store, error) {

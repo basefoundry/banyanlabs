@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage"
@@ -11,9 +12,11 @@ import (
 const serviceName = "url-shortener"
 
 type App struct {
-	logger  *slog.Logger
-	started time.Time
-	store   storage.Store
+	logger        *slog.Logger
+	loginFailures map[string]loginFailureState
+	loginMu       sync.Mutex
+	started       time.Time
+	store         storage.Store
 }
 
 type Options struct {
@@ -34,9 +37,10 @@ func New(options Options) *App {
 	}
 
 	return &App{
-		logger:  logger.With(slog.String("component", "app")),
-		started: time.Now().UTC(),
-		store:   options.Store,
+		logger:        logger.With(slog.String("component", "app")),
+		loginFailures: make(map[string]loginFailureState),
+		started:       time.Now().UTC(),
+		store:         options.Store,
 	}
 }
 

@@ -100,6 +100,39 @@ func TestLoginEndpointRejectsInvalidCredentials(t *testing.T) {
 	}
 }
 
+func TestLoginEndpointReturnsTooManyRequestsAfterRepeatedFailures(t *testing.T) {
+	const lockoutAttempts = 5
+
+	server, _ := newAuthTestServer(t)
+
+	signup := postJSON(t, server, "/auth/signup", `{
+		"username": "alice",
+		"email": "alice@example.com",
+		"password": "correct horse battery staple"
+	}`, nil)
+	if signup.Code != http.StatusCreated {
+		t.Fatalf("signup status = %d, want %d; body=%s", signup.Code, http.StatusCreated, signup.Body.String())
+	}
+
+	for attempt := 0; attempt < lockoutAttempts; attempt++ {
+		response := postJSON(t, server, "/auth/login", `{
+			"username": "alice",
+			"password": "wrong password"
+		}`, nil)
+		if response.Code != http.StatusUnauthorized {
+			t.Fatalf("attempt %d status = %d, want %d; body=%s", attempt+1, response.Code, http.StatusUnauthorized, response.Body.String())
+		}
+	}
+
+	response := postJSON(t, server, "/auth/login", `{
+		"username": "alice",
+		"password": "correct horse battery staple"
+	}`, nil)
+	if response.Code != http.StatusTooManyRequests {
+		t.Fatalf("locked status = %d, want %d; body=%s", response.Code, http.StatusTooManyRequests, response.Body.String())
+	}
+}
+
 func TestLogoutEndpointClearsSessionCookie(t *testing.T) {
 	server, _ := newAuthTestServer(t)
 	signup := postJSON(t, server, "/auth/signup", `{

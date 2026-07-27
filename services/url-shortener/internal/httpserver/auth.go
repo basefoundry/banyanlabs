@@ -161,6 +161,8 @@ func (server *Server) writeAppError(writer http.ResponseWriter, logMessage strin
 		writeJSONError(writer, http.StatusConflict, "user already exists")
 	case errors.Is(err, app.ErrInvalidCredentials):
 		writeJSONError(writer, http.StatusUnauthorized, "invalid credentials")
+	case errors.Is(err, app.ErrTooManyAttempts):
+		writeJSONError(writer, http.StatusTooManyRequests, "too many attempts")
 	default:
 		server.logger.Error(logMessage, slog.Any("error", err))
 		writeJSONError(writer, http.StatusInternalServerError, "internal server error")

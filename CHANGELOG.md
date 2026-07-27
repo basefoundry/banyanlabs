@@ -18,6 +18,8 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Added
 
+- Added username/password validation and local login lockout protection for
+  URL shortener authentication.
 - Added expired session cleanup for URL shortener browser sessions.
 - Added a Go toolchain guard for local URL shortener build and API smoke-test
   paths.
