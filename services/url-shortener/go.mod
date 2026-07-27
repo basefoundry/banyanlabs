@@ -1,6 +1,6 @@
 module github.com/basefoundry/banyanlabs/services/url-shortener
 
-go 1.21
+go 1.25
 
 require modernc.org/sqlite v1.29.10
 

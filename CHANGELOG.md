@@ -9,6 +9,8 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Changed
 
+- Aligned Banyan Labs local and CI Go toolchains on Go 1.25 for patched
+  standard-library security coverage.
 - Updated Banyan Labs repository references, roadmap links, CODEOWNERS, and Go
   module coordinates for the Base Foundry organization migration.
 - Moved the README license notice out of the opening project summary.
@@ -16,6 +18,7 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Added
 
+- Added Go vulnerability scanning to CI with `govulncheck`.
 - Added the AGPL-3.0-or-later application notice to `LICENSE`.
 - Added URL shortener package tests for command and app package coverage.
 - Added URL shortener auth storage and app use cases with bcrypt password
