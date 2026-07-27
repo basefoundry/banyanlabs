@@ -18,6 +18,7 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Added
 
+- Aligned URL shortener request logs with the Banyan Labs logging contract.
 - Added username/password validation and local login lockout protection for
   URL shortener authentication.
 - Added expired session cleanup for URL shortener browser sessions.
