@@ -89,6 +89,58 @@ func TestSignupRejectsDuplicateUser(t *testing.T) {
 	}
 }
 
+func TestSignupRejectsWeakAuthInputs(t *testing.T) {
+	ctx := context.Background()
+	application, _ := newAuthTestApp(t, ctx)
+
+	tests := []struct {
+		name  string
+		input SignupInput
+	}{
+		{
+			name: "short username",
+			input: SignupInput{
+				Username: "al",
+				Email:    "alice@example.com",
+				Password: "correct horse battery staple",
+			},
+		},
+		{
+			name: "invalid username character",
+			input: SignupInput{
+				Username: "alice smith",
+				Email:    "alice@example.com",
+				Password: "correct horse battery staple",
+			},
+		},
+		{
+			name: "invalid email",
+			input: SignupInput{
+				Username: "alice",
+				Email:    "alice",
+				Password: "correct horse battery staple",
+			},
+		},
+		{
+			name: "short password",
+			input: SignupInput{
+				Username: "alice",
+				Email:    "alice@example.com",
+				Password: "too short",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := application.Signup(ctx, test.input)
+			if !errors.Is(err, ErrInvalidInput) {
+				t.Fatalf("signup error = %v, want %v", err, ErrInvalidInput)
+			}
+		})
+	}
+}
+
 func TestLoginCreatesSessionForValidCredentials(t *testing.T) {
 	ctx := context.Background()
 	application, _ := newAuthTestApp(t, ctx)
@@ -139,6 +191,84 @@ func TestLoginRejectsInvalidCredentials(t *testing.T) {
 	})
 	if !errors.Is(err, ErrInvalidCredentials) {
 		t.Fatalf("login error = %v, want %v", err, ErrInvalidCredentials)
+	}
+}
+
+func TestLoginLocksOutAfterRepeatedFailures(t *testing.T) {
+	ctx := context.Background()
+	application, _ := newAuthTestApp(t, ctx)
+
+	_, err := application.Signup(ctx, SignupInput{
+		Username: "alice",
+		Email:    "alice@example.com",
+		Password: "correct horse battery staple",
+	})
+	if err != nil {
+		t.Fatalf("signup: %v", err)
+	}
+
+	for attempt := 0; attempt < maxFailedLoginAttempts; attempt++ {
+		_, err := application.Login(ctx, LoginInput{
+			Username: "alice",
+			Password: "wrong password",
+		})
+		if !errors.Is(err, ErrInvalidCredentials) {
+			t.Fatalf("attempt %d error = %v, want %v", attempt+1, err, ErrInvalidCredentials)
+		}
+	}
+
+	_, err = application.Login(ctx, LoginInput{
+		Username: "alice",
+		Password: "correct horse battery staple",
+	})
+	if !errors.Is(err, ErrTooManyAttempts) {
+		t.Fatalf("locked login error = %v, want %v", err, ErrTooManyAttempts)
+	}
+}
+
+func TestLoginClearsFailureCountAfterSuccess(t *testing.T) {
+	ctx := context.Background()
+	application, _ := newAuthTestApp(t, ctx)
+
+	_, err := application.Signup(ctx, SignupInput{
+		Username: "alice",
+		Email:    "alice@example.com",
+		Password: "correct horse battery staple",
+	})
+	if err != nil {
+		t.Fatalf("signup: %v", err)
+	}
+
+	_, err = application.Login(ctx, LoginInput{
+		Username: "alice",
+		Password: "wrong password",
+	})
+	if !errors.Is(err, ErrInvalidCredentials) {
+		t.Fatalf("first login error = %v, want %v", err, ErrInvalidCredentials)
+	}
+
+	if _, err := application.Login(ctx, LoginInput{
+		Username: "alice",
+		Password: "correct horse battery staple",
+	}); err != nil {
+		t.Fatalf("successful login: %v", err)
+	}
+
+	for attempt := 0; attempt < maxFailedLoginAttempts-1; attempt++ {
+		_, err := application.Login(ctx, LoginInput{
+			Username: "alice",
+			Password: "wrong password",
+		})
+		if !errors.Is(err, ErrInvalidCredentials) {
+			t.Fatalf("attempt %d error = %v, want %v", attempt+1, err, ErrInvalidCredentials)
+		}
+	}
+
+	if _, err := application.Login(ctx, LoginInput{
+		Username: "alice",
+		Password: "correct horse battery staple",
+	}); err != nil {
+		t.Fatalf("login after cleared failures: %v", err)
 	}
 }
 
