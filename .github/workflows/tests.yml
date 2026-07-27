@@ -70,7 +70,7 @@ jobs:
         if: steps.go_project.outputs.present == 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version: "1.25"
 
       - name: Vet
         if: steps.go_project.outputs.present == 'true'
@@ -115,7 +115,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version: "1.25"
 
       - name: Install Hurl
         shell: bash
@@ -212,9 +212,28 @@ jobs:
   security:
     name: Security scanners
     runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: "0"
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Detect Go project
+        id: go_project
+        shell: bash
+        run: |
+          if find . -name go.mod -not -path './.git/*' -print -quit | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No go.mod found; skipping Go vulnerability scan."
+          fi
+
+      - name: Set up Go
+        if: steps.go_project.outputs.present == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -225,6 +244,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install bandit
+
+      - name: Install Go scanner
+        if: steps.go_project.outputs.present == 'true'
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run Bandit
         shell: bash
@@ -237,3 +262,13 @@ jobs:
           fi
 
           bandit -q -r . -x '*/tests/*' --severity-level medium
+
+      - name: Run govulncheck
+        if: steps.go_project.outputs.present == 'true'
+        shell: bash
+        run: |
+          while IFS= read -r module; do
+            module_dir="$(dirname "$module")"
+            echo "Running govulncheck in $module_dir"
+            (cd "$module_dir" && govulncheck ./...)
+          done < <(find . -name go.mod -not -path './.git/*' -print | sort)
