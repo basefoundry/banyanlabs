@@ -4,6 +4,9 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 service_dir="$repo_root/services/url-shortener"
 
+# shellcheck source=scripts/go-toolchain.sh
+source "$repo_root/scripts/go-toolchain.sh"
+
 runtime_root="${BANYANLABS_RUNTIME_DIR:-$repo_root/var}"
 run_dir="$runtime_root/run"
 log_dir="$runtime_root/log"
@@ -23,11 +26,13 @@ binary_path="$bin_dir/${service_name}"
 usage() {
   cat <<'EOF'
 Usage:
+  scripts/services.sh build
   scripts/services.sh dev [--foreground]
   scripts/services.sh status
   scripts/services.sh stop
 
 Commands:
+  build         Build local service binaries.
   dev           Start local services in the background by default.
   status        List local service status.
   stop          Stop background local services started by this script.
@@ -69,7 +74,7 @@ build_url_shortener() {
   local go_cache_dir="$cache_dir/go-build"
   local go_tmp_dir="$cache_dir/go-tmp"
 
-  require_command go
+  banyanlabs_require_go_toolchain "$repo_root"
   mkdir -p "$bin_dir" "$go_cache_dir" "$go_tmp_dir" "$(dirname "$database_path")"
 
   printf 'Building %s.\n' "$service_name"
@@ -271,6 +276,15 @@ main() {
     dev)
       shift
       run_dev "$@"
+      ;;
+    build)
+      shift
+      (($# == 0)) || {
+        usage >&2
+        printf 'ERROR: build does not accept extra arguments.\n' >&2
+        return 2
+      }
+      build_url_shortener
       ;;
     status)
       shift
