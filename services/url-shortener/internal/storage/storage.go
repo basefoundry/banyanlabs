@@ -51,4 +51,5 @@ type Store interface {
 	FindSessionByTokenHash(context.Context, string) (Session, error)
 	TouchSessionByTokenHash(context.Context, string, time.Time) error
 	DeleteSessionByTokenHash(context.Context, string) error
+	DeleteExpiredSessions(context.Context, time.Time) (int64, error)
 }
