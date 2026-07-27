@@ -18,6 +18,8 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Added
 
+- Added the GitHub Project intake configuration and workflow to the repo
+  baseline.
 - Added Go vulnerability scanning to CI with `govulncheck`.
 - Added the AGPL-3.0-or-later application notice to `LICENSE`.
 - Added URL shortener package tests for command and app package coverage.
