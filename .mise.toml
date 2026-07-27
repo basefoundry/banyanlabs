@@ -10,7 +10,7 @@ run = "tests/validate.sh && cd services/url-shortener && go test ./... && cd ../
 
 [tasks.build]
 description = "Build the URL shortener service"
-run = "cd services/url-shortener && go build ./..."
+run = "scripts/services.sh build"
 
 [tasks.dev]
 description = "Start the URL shortener service locally"

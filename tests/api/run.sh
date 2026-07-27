@@ -5,6 +5,9 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 service_dir="$repo_root/services/url-shortener"
 tests_dir="$repo_root/tests/api/url-shortener"
 
+# shellcheck source=../../scripts/go-toolchain.sh
+source "$repo_root/scripts/go-toolchain.sh"
+
 addr="${BANYAN_URL_SHORTENER_ADDR:-127.0.0.1:18080}"
 base_url="${BANYAN_URL_SHORTENER_BASE_URL:-http://${addr}}"
 tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/banyanlabs-url-shortener-api.XXXXXX")"
@@ -37,7 +40,7 @@ cleanup() {
 trap cleanup EXIT
 
 require_command curl
-require_command go
+banyanlabs_require_go_toolchain "$repo_root"
 require_command hurl
 
 mkdir -p "$go_cache_dir" "$go_tmp_dir"
