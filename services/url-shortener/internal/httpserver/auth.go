@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/app"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
 )
 
 const sessionCookieName = "banyan_url_shortener_session"

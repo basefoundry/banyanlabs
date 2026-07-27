@@ -2,7 +2,7 @@
 
 Banyan Labs uses GitHub Issues as the product backlog and Git worktrees for
 parallel pull request work. This mirrors
-[Base](https://github.com/codeforester/base#readme) so humans and AI-assisted
+[Base](https://github.com/basefoundry/base#readme) so humans and AI-assisted
 development agents follow the same rules across both repositories.
 
 ## Labels

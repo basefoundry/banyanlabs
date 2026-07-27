@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/app"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
 )
 
 type App interface {

@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/app"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
 )
 
 func TestHealthEndpoint(t *testing.T) {

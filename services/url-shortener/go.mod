@@ -1,4 +1,4 @@
-module github.com/codeforester/banyanlabs/services/url-shortener
+module github.com/basefoundry/banyanlabs/services/url-shortener
 
 go 1.21
 

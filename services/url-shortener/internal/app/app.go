@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage"
 )
 
 const serviceName = "url-shortener"

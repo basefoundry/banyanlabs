@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/app"
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/config"
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/httpserver"
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/logging"
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage/sqlite"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/config"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/httpserver"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/logging"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage/sqlite"
 )
 
 func main() {

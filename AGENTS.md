@@ -10,7 +10,7 @@ is a navigation layer over `CONTRIBUTING.md`, `docs/github-workflow.md`, and
   observability, infrastructure, and platform engineering practice.
 - Keep shared workstation setup, repository discovery, and Base-managed
   workspace orchestration in the sibling
-  [Base](https://github.com/codeforester/base#readme) repository.
+  [Base](https://github.com/basefoundry/base#readme) repository.
 - Adopt external agent workflow ideas only after translating them into
   Banyan Labs-specific guidance. Do not vendor or require a third-party
   methodology when a smaller repo-native rule is enough.

@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/app"
-	"github.com/codeforester/banyanlabs/services/url-shortener/internal/storage/sqlite"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
+	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/storage/sqlite"
 )
 
 func TestSignupEndpointCreatesSessionCookie(t *testing.T) {

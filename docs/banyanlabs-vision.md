@@ -34,7 +34,7 @@ The first service is the URL shortener.
 Initial decisions:
 
 - language: Go
-- module path: `github.com/codeforester/banyanlabs/services/url-shortener`
+- module path: `github.com/basefoundry/banyanlabs/services/url-shortener`
 - location: `services/url-shortener`
 - storage: SQLite for local deployment
 - UI: minimal HTML UI from day one
@@ -49,7 +49,7 @@ database migrations, CI/CD, and environment promotion.
 
 The first phase is intentionally local:
 
-Base refers to the sibling [Base](https://github.com/codeforester/base#readme)
+Base refers to the sibling [Base](https://github.com/basefoundry/base#readme)
 repository that owns shared workspace tooling.
 
 ```text
