@@ -9,11 +9,19 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Changed
 
+- Updated Banyan Labs repository references, roadmap links, CODEOWNERS, and Go
+  module coordinates for the Base Foundry organization migration.
 - Moved the README license notice out of the opening project summary.
 - Relicensed Banyan Labs prospectively from MIT to AGPL-3.0-or-later.
 
 ### Added
 
+- Added the AGPL-3.0-or-later application notice to `LICENSE`.
+- Added URL shortener package tests for command and app package coverage.
+- Added URL shortener auth storage and app use cases with bcrypt password
+  hashes and hashed opaque session tokens.
+- Added cookie-backed URL shortener auth endpoints for signup, login, and
+  logout, including OpenAPI and Hurl smoke-test coverage.
 - Initialized the repository with the Base-managed repo baseline.
 - Documented the Banyan Labs platform lab vision and first service direction.
 - Linked Banyan Labs documentation references to the Base README.
