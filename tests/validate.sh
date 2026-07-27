@@ -7,7 +7,9 @@ required_files=(
   CONTRIBUTING.md
   AGENTS.md
   skills.md
+  .github/base-project.yml
   .github/pull_request_template.md
+  .github/workflows/project-intake.yml
   LICENSE
   base_manifest.yaml
 )
