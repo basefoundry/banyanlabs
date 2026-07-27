@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/basefoundry/banyanlabs/services/url-shortener/internal/app"
@@ -114,15 +115,52 @@ func (server *Server) logRequests(next http.Handler) http.Handler {
 
 		next.ServeHTTP(recorder, request)
 
-		server.logger.Info(
-			"request completed",
+		attrs := []any{
 			slog.String("request_id", requestID),
 			slog.String("method", request.Method),
 			slog.String("path", request.URL.Path),
 			slog.Int("status", recorder.status),
 			slog.Int64("duration_ms", time.Since(start).Milliseconds()),
-		)
+		}
+		if traceID, spanID := requestTraceContext(request); traceID != "" {
+			attrs = append(attrs, slog.String("trace_id", traceID))
+			if spanID != "" {
+				attrs = append(attrs, slog.String("span_id", spanID))
+			}
+		}
+
+		server.logger.Info("request completed", attrs...)
 	})
+}
+
+func requestTraceContext(request *http.Request) (string, string) {
+	if traceparent := request.Header.Get("traceparent"); traceparent != "" {
+		parts := strings.Split(traceparent, "-")
+		if len(parts) >= 4 && validTraceID(parts[1]) && validSpanID(parts[2]) {
+			return parts[1], parts[2]
+		}
+	}
+
+	traceID := strings.TrimSpace(request.Header.Get("X-Trace-ID"))
+	spanID := strings.TrimSpace(request.Header.Get("X-Span-ID"))
+	return traceID, spanID
+}
+
+func validTraceID(traceID string) bool {
+	return len(traceID) == 32 && traceID != "00000000000000000000000000000000" && isLowerHex(traceID)
+}
+
+func validSpanID(spanID string) bool {
+	return len(spanID) == 16 && spanID != "0000000000000000" && isLowerHex(spanID)
+}
+
+func isLowerHex(value string) bool {
+	for _, char := range value {
+		if (char < '0' || char > '9') && (char < 'a' || char > 'f') {
+			return false
+		}
+	}
+	return true
 }
 
 type statusRecorder struct {
