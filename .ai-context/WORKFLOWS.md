@@ -16,6 +16,9 @@ basectl run banyanlabs stop
 `dev` starts background services; `dev -- --foreground` runs in the foreground.
 Service development can also use `CGO_ENABLED=0 go test ./...`, `go vet ./...`,
 and `go build ./...` from the Go module after preparing its toolchain.
+Local mise setup and the module's minimum Go patch version must stay aligned;
+CI selects its Go toolchain from `services/url-shortener/go.mod`. Rerun setup
+after toolchain security updates.
 
 Use an issue, a single category label, and a dedicated issue worktree based on
 `origin/main`. Link the PR to its issue and report fresh validation. Documentation

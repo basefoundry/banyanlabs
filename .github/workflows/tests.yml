@@ -70,7 +70,7 @@ jobs:
         if: steps.go_project.outputs.present == 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25"
+          go-version-file: services/url-shortener/go.mod
 
       - name: Vet
         if: steps.go_project.outputs.present == 'true'
@@ -115,7 +115,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25"
+          go-version-file: services/url-shortener/go.mod
 
       - name: Install Hurl
         shell: bash
@@ -233,7 +233,7 @@ jobs:
         if: steps.go_project.outputs.present == 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25"
+          go-version-file: services/url-shortener/go.mod
 
       - name: Set up Python
         uses: actions/setup-python@v5

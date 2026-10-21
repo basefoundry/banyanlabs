@@ -38,6 +38,11 @@ That setup path uses:
 - `.mise.toml` to install the Go runtime
 - `base_manifest.yaml` to connect those tools to Base
 
+The Go patch version in `.mise.toml` matches the minimum in
+`services/url-shortener/go.mod`; CI reads that module requirement for service,
+API, and security checks. Update both declarations together when applying Go
+security fixes, then rerun setup to refresh an existing local installation.
+
 After setup:
 
 ```bash

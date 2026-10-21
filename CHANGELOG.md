@@ -9,8 +9,8 @@ and versions are tracked in the repo-root `VERSION` file.
 
 ### Changed
 
-- Aligned Banyan Labs local and CI Go toolchains on Go 1.25 for patched
-  standard-library security coverage.
+- Aligned Banyan Labs local and CI Go toolchains on Go 1.26.10 for patched
+  standard-library security coverage; CI reads the module's required version.
 - Updated Banyan Labs repository references, roadmap links, CODEOWNERS, and Go
   module coordinates for the Base Foundry organization migration.
 - Moved the README license notice out of the opening project summary.
